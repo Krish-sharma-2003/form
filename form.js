@@ -1,45 +1,80 @@
-const form = document.getElementById("form");
-const result = document.getElementById("result");
+const form = document.getElementById('form');
+const submitBtn = form.querySelector('button[type="submit"]');
 
-form.addEventListener("submit", function (e) {
-  const formData = new FormData(form);
-  e.preventDefault();
+form.addEventListener('submit', async (e) => {
+    e.preventDefault();
 
-  const file = document.getElementById("attachment");
-  const filesize = file.files[0].size / 1024;
+    const formData = new FormData(form);
+    formData.append("access_key", "16c390b4-a8ab-4290-bcfc-64babf69cc13");
 
-  if (filesize > 1000) {
-    alert("Please upload file less than 1 MB");
-    return;
-  }
+    const originalText = submitBtn.textContent;
 
-  result.innerHTML = "Please wait...";
+    submitBtn.textContent = "Sending...";
+    submitBtn.disabled = true;
 
-  fetch("https://api.web3forms.com/submit", {
-    method: "POST",
-    body: formData
-  })
-    .then(async (response) => {
-      let json = await response.json();
-      if (response.status == 200) {
-        result.innerHTML = json.message;
-        result.classList.remove("text-gray-500");
-        result.classList.add("text-green-500");
-      } else {
-        console.log(response);
-        result.innerHTML = json.message;
-        result.classList.remove("text-gray-500");
-        result.classList.add("text-red-500");
-      }
-    })
-    .catch((error) => {
-      console.log(error);
-      result.innerHTML = "Something went wrong!";
-    })
-    .then(function () {
-      form.reset();
-      setTimeout(() => {
-        result.style.display = "none";
-      }, 5000);
-    });
+    try {
+        const response = await fetch("https://api.web3forms.com/submit", {
+            method: "POST",
+            body: formData
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+            alert("Success! Your message has been sent.");
+            form.reset();
+        } else {
+            alert("Error: " + data.message);
+        }
+
+    } catch (error) {
+        alert("Something went wrong. Please try again.");
+    } finally {
+        submitBtn.textContent = originalText;
+        submitBtn.disabled = false;
+    }
 });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
